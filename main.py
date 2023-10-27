@@ -11,7 +11,7 @@ class App(ctk.CTk):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.geometry("500x600")
+        self.geometry("500x700")
         self.iconbitmap('Headington Logo.ico')
         self.title("Headington Portal")
         self.resizable(False, False)
@@ -71,6 +71,9 @@ class LoginScreen(ctk.CTkFrame):
         name.bind('<FocusOut>', update_welcome_label)
         work_id.place(relx=0.5, rely=0.48, anchor="center")
         password.place(relx=0.5, rely=0.58, anchor="center")
+
+        # forgot_password = ctk.CTkEntry(self, placeholder_text="Name",
+        #                                height=45, width=300)
 
         def validate(filename='accounts.json'):
             with open(filename, 'r+') as file:
@@ -213,6 +216,13 @@ class MainScreen(ctk.CTkFrame):
 
             elif field == "vis":
                 widgets_to_clear = [vis_fname_entry, vis_lname_entry, vis_email_entry, checkin_time, date_entry]
+            elif field == "d_all":
+                widgets_to_clear = [res_fname_entry, res_lname_entry, res_email_entry, res_room_entry, vis_fname_entry,
+                                    vis_lname_entry, vis_email_entry, checkin_time, date_entry]
+                vis_combobox.set("")
+                res_combobox.set("")
+                vis_combobox.configure(state="disabled")
+                res_combobox.configure(state="disabled")
             else:
                 return  # Handle other cases or raise an exception if needed
 
@@ -277,6 +287,9 @@ class MainScreen(ctk.CTkFrame):
         vis_fname_entry.place(relx=0.55, rely=0.35)
         vis_lname_entry.place(relx=0.55, rely=0.45)
         vis_email_entry.place(relx=0.55, rely=0.55)
+        # date_entry.place(relx=0.55, rely=0.55)
+        # checkin_time.place(relx=0.725, rely=0.55)
+        # checkout_time.place(relx=0.85, rely=0.55)
 
         # Formatting the entries into Title (First letter is capital)
         # Resident
@@ -290,7 +303,6 @@ class MainScreen(ctk.CTkFrame):
         vis_lname_entry.bind("<KeyRelease>", caps)
         vis_email_entry.bind("<KeyRelease>", caps)
 
-        # Function to add resident
         def add_resident(res_fname, res_lname, res_email, res_room, filename="people_profile.json"):
             res_room = str(re.findall("[A-Za-z]\\d{3}", res_room_entry.get())[0])
             full_name = res_fname.lower() + " " + res_lname.lower()
@@ -316,7 +328,6 @@ class MainScreen(ctk.CTkFrame):
                     file.seek(0)
                     json.dump(file_data, file, indent=1)
 
-        # Function to automatically fill the visitor's entry boxes if the visitor is in the system
         def fill_visitor_entries(choice):
             time_now = datetime.now().strftime("%H:%M")
             today = datetime.today().strftime("%m/%d/%y")
@@ -336,7 +347,6 @@ class MainScreen(ctk.CTkFrame):
             change_state("R_ALL")
             return choice.split(" ")[0] + " " + choice.split(" ")[1]
 
-         # Function to automatically fill the resident's entry boxes if the resident is in the system
         def fill_resident_entries(choice):
             clear("res")
 
@@ -440,20 +450,14 @@ class MainScreen(ctk.CTkFrame):
             return [list_of_visitors, list_of_mails]
 
         # Bind the make_visitor_list function to changes in the res_fname_entry
+        # if res_room_entry.get()
         # res_fname_entry.bind("<KeyRelease>", make_visitor_list)
 
-        # CHECK TO MAKE THIS WORK
-        entry_next_button = ctk.CTkButton(self, text="Add Resident", font=("Times", 14), width=200, )
-        entry_next_button.bind("<Button-1>", lambda event: add_resident(
-            res_fname_entry.get(),
-            res_lname_entry.get(),
-            res_email_entry.get(),
-            res_room_entry.get()
-        ))
+        # Button to clear everything and disable the comboboxes
+        clear_button = ctk.CTkButton(self, text="Delete", font=("Times", 14), width=200, )
+        clear_button.bind("<Button-1>", lambda event: clear("d_all"))
+        clear_button.place(relx=0.03, rely=0.625)
 
-        entry_next_button.place(relx=0.03, rely=0.65)
-
-        # Function to add the visitor in the JSON file
         def add_visitor(vis_fname, vis_lname, vis_email, res_room, res_name, filename="people_profile.json"):
             vis_full_name = f"{vis_fname.lower()} {vis_lname.lower()}"
             visitor_profile = {"vis_fullname": vis_full_name, "vis_email": vis_email}
@@ -478,7 +482,7 @@ class MainScreen(ctk.CTkFrame):
                             file.seek(0)
                             json.dump(file_data, file, indent=1)
 
-        # Function used to check-in visitors
+        # Function used to check in visitors
         def checkin_visitor(vis_fname, vis_lname, vis_email, res_room, res_name,
                             filename="visitation_log.json"):
             time_now = datetime.now().strftime("%H:%M")
@@ -498,7 +502,6 @@ class MainScreen(ctk.CTkFrame):
                 file.seek(0)
                 json.dump(file_data, file, indent=1)
 
-        # Function used to validate all the entries and then proceeds to check-in the visitor and add the resident and visitor if needed
         def validate_entry(event=None):
             resident_room = res_room_entry.get().lower().strip()
             resident_room_pattern = "^[A-Za-z]\d{3}"  # The desired pattern
@@ -536,12 +539,14 @@ class MainScreen(ctk.CTkFrame):
                                                                                          f"Date: {checkin_date} \nTime: {checkin_times} "
                                                                 , icon="check",
                                                                 option_1="OK")
+                                            # clear("all")
 
                                         # Update the vis_combobox with no visitors found
                                         except json.JSONDecodeError:
                                             msg = CTkMessagebox(title="Error", message="Error: Submission unsuccessful."
                                                                 , icon="cancel",
                                                                 option_1="OK")
+                                        # clear("all")
                                         break
 
                         if found_resident and not found_visitor:
@@ -573,6 +578,8 @@ class MainScreen(ctk.CTkFrame):
                     res_combobox.set("")
                     vis_combobox.configure(state="disabled")
                     res_combobox.configure(state="disabled")
+                    # change_state("D_ALL")
+                    checkout_visitors_list()
                 else:
                     msg = CTkMessagebox(title="Warning", message="Kindly complete all required fields.", icon="warning",
                                         option_1="OK")
@@ -584,7 +591,98 @@ class MainScreen(ctk.CTkFrame):
         submit_button = ctk.CTkButton(self, text="Submit Entry", font=("Times", 14), width=200, fg_color="#841617",
                                       hover_color='#991112')
         submit_button.bind("<Button-1>", validate_entry)
-        submit_button.place(relx=0.55, rely=0.65)
+        submit_button.place(relx=0.55, rely=0.625)
+
+    # ---------------------------- Check out visitor section ---------------------------------------------------
+        checkout_label = ctk.CTkLabel(self, text="Check-out Visitor", font=("Times", 16, "bold"))
+        checkout_label.place(relx=0.03, rely=0.69)
+
+        vis_cout_combobox = ctk.CTkComboBox(self, values=None, variable=ctk.StringVar(value="No Visitor"), width=200, state="disabled")
+        vis_cout_combobox.place(relx=0.03, rely=0.74)
+
+        vis_cout_fname = ctk.CTkEntry(self, width=200)
+        vis_cout_lname = ctk.CTkEntry(self, width=200)
+        vis_cout_fname.place(relx=0.03, rely=0.81)
+        vis_cout_lname.place(relx=0.03, rely=0.88)
+
+        # Function to change the state of the visitor entries checkout section
+        def change_cout_state():
+            vis_cout_fname.configure(state="readonly")
+            vis_cout_lname.configure(state="readonly")
+
+        def checkout_visitor_entries(choice):
+            vis_cout_fname.configure(state="normal")
+            vis_cout_lname.configure(state="normal")
+
+            vis_cout_fname.delete(0, tkinter.END)
+            vis_cout_lname.delete(0, tkinter.END)
+
+            vis_fname, vis_lname = choice.split(" ")
+            vis_cout_fname.insert(0, vis_fname)
+            vis_cout_lname.insert(0, vis_lname)
+
+            vis_cout_fname.configure(state="readonly")
+            vis_cout_lname.configure(state="readonly")
+
+            return vis_fname + " " + vis_lname
+        # Function to make the list of visitors before checkout
+        def checkout_visitors_list(event=None):
+            today = datetime.today().strftime("%m/%d/%y")
+            visitors_list_today = []
+            checkin_visit_time = []
+            with open('visitation_log.json', 'r+') as file:
+                file_data = json.load(file)
+            for visit in file_data['visitation']:
+                if visit["checkin_date"] == today and visit['checkout_time'] == "":
+                    visitors_list_today.append(visit["vis_fullname"].title())
+                    checkin_visit_time.append(visit['checkin_time'])
+
+            if visitors_list_today:
+                vis_cout_combobox.configure(state="readonly", values=visitors_list_today, command=checkout_visitor_entries)
+                vis_cout_combobox.set(visitors_list_today[0])
+            if len(visitors_list_today) == 0:
+                vis_cout_combobox.set("No Visitor")
+                vis_cout_combobox.configure(state="disabled")
+            return [visitors_list_today, checkin_visit_time]
+            
+        # Function to checkout visitor
+        def checkout_visitor(event=None):
+            today = datetime.today().strftime("%m/%d/%y")
+            current_time = datetime.now().strftime("%H:%M")
+            visitor_to_checkout = vis_cout_fname.get() + " " + vis_cout_lname.get()
+            print(visitor_to_checkout)
+            with open('visitation_log.json', 'r+') as file:
+                file_data = json.load(file)
+                for visit in file_data['visitation']:
+                    if visit["checkin_date"] == today:
+                        if visit["vis_fullname"].lower() == visitor_to_checkout.lower():
+                            visit['checkout_time'] = current_time
+                            break
+            with open('visitation_log.json', 'w') as file:
+                json.dump(file_data, file, indent=1)
+
+            vis_cout_fname.configure(state='normal')
+            vis_cout_lname.configure(state='normal')
+            vis_cout_fname.delete(0, tkinter.END)
+            vis_cout_lname.delete(0, tkinter.END)
+            change_cout_state()
+            checkout_visitors_list()
+
+        def cancel(event):
+            vis_cout_fname.configure(state='normal')
+            vis_cout_lname.configure(state='normal')
+            vis_cout_fname.delete(0, tkinter.END)
+            vis_cout_lname.delete(0, tkinter.END)
+            change_cout_state()
+
+        checkout_button = ctk.CTkButton(self, text="Check Out", width=95)
+        checkout_button.place(relx=0.24, rely=0.94)
+        checkout_button.bind("<Button-1>", checkout_visitor)
+
+        cancel_button = ctk.CTkButton(self, text="Cancel", width=95)
+        cancel_button.place(relx=0.03, rely=0.94)
+        cancel_button.bind("<Button-1>", cancel)
+        checkout_visitors_list()
 
 
 if __name__ == '__main__':
