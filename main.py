@@ -1,138 +1,64 @@
 import customtkinter as ctk
 from twilio.rest import Client
-from PIL import Image
 from CTkMessagebox import CTkMessagebox
 import re
 import tkinter
 import json
 from datetime import datetime
-import secrets # File containing all Twilio and API information - this allows to send messages to checked-out visitors
+import secrets # File contains all API keys and auth from Twilio and the WeatherAPI
+from weather import WeatherDisplayFrame
 
 
 class App(ctk.CTk):
     def __init__(self, **kwargs):
+        """
+       Initialize the main application window.
+
+       Parameters:
+       - **kwargs: Additional keyword arguments.
+
+       This constructor sets up the main application window with specific attributes.
+       """
         super().__init__(**kwargs)
 
-        self.geometry("500x700")
-        self.iconbitmap(r"venv/data/images/Headington Logo.ico")
-        self.title("Headington Portal")
-        self.resizable(False, False)
-        self.login_screen = LoginScreen(self, self.winfo_screenheight(), self.winfo_screenwidth())
-        self.main_screen = MainScreen(self, self.winfo_screenheight(), self.winfo_screenwidth())
-        self.other_screen = OtherScreen(self, self.winfo_screenheight(), self.winfo_screenwidth())
+        self.geometry("500x700")  # Set the initial window size
+        self.iconbitmap(r"venv/data/images/Headington Logo.ico")  # Set the window icon
+        self.title("Headington Portal")  # Set the window title
+        self.resizable(False, False)  # Disable window resizing
+        self.main_screen = MainScreen(self, self.winfo_screenheight(),
+                                      self.winfo_screenwidth())  # Create the main screen
         self.current_screen = None  # Track the current active screen
-        self.show_main_screen()  # Show the login screen initially
 
-    def show_login_screen(self):
-        if self.current_screen:
-            self.current_screen.pack_forget()  # Hide the current screen if there is one
-        self.login_screen.pack(fill='both', expand=True)
-        self.current_screen = self.login_screen
-
-    def show_other_screen(self):
-        if self.current_screen:
-            self.current_screen.pack_forget()  # Hide the current screen if there is one
-        self.other_screen.pack(fill='both', expand=True)
-        self.current_screen = self.other_screen
+        self.show_main_screen()  # Show the main screen initially
 
     def show_main_screen(self):
+        """
+        Display the main screen.
+
+        This function hides the current screen, if any, and displays the main screen.
+        """
         if self.current_screen:
             self.current_screen.pack_forget()  # Hide the current screen if there is one
-        self.main_screen.pack(fill='both', expand=True)
-        self.current_screen = self.main_screen
-
-
-class LoginScreen(ctk.CTkFrame):
-    def __init__(self, container, app_height, app_width):
-        super().__init__(container, height=app_height, width=app_width)
-        ctk.set_appearance_mode("light")
-
-        def update_welcome_label(event=None):
-            if len(name.get()) > 0:
-                welcome_label.configure(text="Welcome " + name.get().title().strip())
-            else:
-                welcome_label.configure(text="Welcome to Headington Hall")
-
-        # WELCOME TEXT
-        welcome_label = ctk.CTkLabel(self, text="Welcome to Headington Hall",
-                                     font=("Times", 20, "bold", "italic"), text_color="#841617", wraplength=250)
-        welcome_label.place(relx=0.5, rely=0.08, anchor="n")
-
-        # HEADINGTON LOGO
-        logo = "venv/data/images/Headington Logo.png"
-        accounts_path = r"venv/data/json_files/accounts.json"
-        my_image = ctk.CTkImage(light_image=Image.open(logo), size=(72, 72))
-        image_label = ctk.CTkLabel(self, image=my_image, text="")
-        image_label.place(relx=0.5, rely=0.24, anchor="center")
-
-        name = ctk.CTkEntry(self, placeholder_text="Name",
-                            height=45, width=300)
-        work_id = ctk.CTkEntry(self, placeholder_text="Work ID",
-                               height=45, width=300)
-        password = ctk.CTkEntry(self, placeholder_text="Password", height=45, width=300,
-                                show="*")  # Show password as asterisks
-        name.place(relx=0.5, rely=0.38, anchor="center")
-        name.bind('<FocusOut>', update_welcome_label)
-        work_id.place(relx=0.5, rely=0.48, anchor="center")
-        password.place(relx=0.5, rely=0.58, anchor="center")
-
-        # forgot_password = ctk.CTkEntry(self, placeholder_text="Name",
-        #                                height=45, width=300)
-
-        def validate(filename=accounts_path):
-            with open(filename, 'r+') as file:
-                file_data = json.load(file)
-
-            for account in file_data['accounts']:
-                if account.get('name').lower().strip() == name.get().lower().strip():
-                    container.show_main_screen()
-                else:
-                    pass
-
-        login_button = ctk.CTkButton(self, text="Login", height=40, width=300,
-                                     corner_radius=65, fg_color="#841617",
-                                     hover_color="#841617",  # Change hover color here
-                                     border_width=2, text_color="#ffffff", border_color="#ffffff",
-                                     command=lambda: validate())
-
-        login_button.place(relx=0.5, rely=0.68, anchor="center")
-
-
-class OtherScreen(ctk.CTkFrame):
-    def __init__(self, container, app_height, app_width):
-        super().__init__(container, height=app_height, width=app_width)
-
-        # WELCOME TEXT
-        welcome_label = ctk.CTkLabel(self, text="Screen 2",
-                                     font=("Times", 20, "bold", "italic"), text_color="#841617", wraplength=250)
-        welcome_label.place(relx=0.5, rely=0.15, anchor="n")
-
-        # HEADINGTON LOGO
-        # my_image = ctk.CTkImage(light_image=Image.open("Headington Logo.png"), size=(72, 72))
-        # image_label = ctk.CTkLabel(self, image=my_image, text="")
-        # image_label.place(relx=0.5, rely=0.25, anchor="center")
-
-        name = ctk.CTkEntry(self, placeholder_text="Name",
-                            height=45, width=300)
-        work_id = ctk.CTkEntry(self, placeholder_text="Work ID",
-                               height=45, width=300)
-        password = ctk.CTkEntry(self, placeholder_text="Password", height=45, width=300,
-                                show="*")  # Show password as asterisks
-        login_button = ctk.CTkButton(self, text="Login", height=40, width=300,
-                                     corner_radius=65, fg_color="#841617",
-                                     hover_color="#841617",  # Change hover color here
-                                     border_width=2, text_color="#ffffff", border_color="#ffffff",
-                                     command=lambda: container.show_login_screen())
-        name.place(relx=0.5, rely=0.40, anchor="center")
-        work_id.place(relx=0.5, rely=0.50, anchor="center")
-        password.place(relx=0.5, rely=0.60, anchor="center")
-        login_button.place(relx=0.5, rely=0.70, anchor="center")
+        self.main_screen.pack(fill='both', expand=True)  # Display the main screen
+        self.current_screen = self.main_screen  # Update the current active screen
 
 
 class MainScreen(ctk.CTkFrame):
 
     def __init__(self, container, app_height, app_width):
+        """
+        Initialize the main screen.
+
+        Parameters:
+        - container: The parent container.
+        - app_height: Height of the application window.
+        - app_width: Width of the application window.
+
+        This constructor sets up the main screen with various widgets.
+        """
         super().__init__(container, height=app_height, width=app_width)
+
+        # Create and place widgets on the main screen
         new_entry_label = ctk.CTkLabel(self, text="New Entry", font=("Times", 18, "bold"))
         new_entry_label.place(relx=0.03, rely=0.03)
         res_combobox = ctk.CTkComboBox(self, width=200, values=None, variable=None, state='disabled')
@@ -145,6 +71,7 @@ class MainScreen(ctk.CTkFrame):
         visitation_path = r"venv/data/json_files/visitation_log.json"
         people_path = r"venv/data/json_files/people_profile.json"
 
+        # Several functions for widget behavior and states
         # Function to capitalize entries and make change email to lowercase
         def caps(event):
             fname_input.set(fname_input.get().title())
@@ -158,6 +85,8 @@ class MainScreen(ctk.CTkFrame):
         def validate_input(phone_number):
             # phone_number is the proposed input; return True to allow, False to reject
             return phone_number.isdigit() and len(phone_number) <= 10 or phone_number == ""
+
+        # Register validation function and event handlers
         validate_func = self.register(validate_input)
 
         def set_entry_limit(room):
@@ -165,6 +94,7 @@ class MainScreen(ctk.CTkFrame):
                 room_input.set(room_input.get()[:4])
 
         # Function to change the states of the widgets
+        # Default state: All input fields are enabled
         def change_state(states):
             if states == 'DR':
                 res_fname_entry.configure(state="readonly")
@@ -219,6 +149,15 @@ class MainScreen(ctk.CTkFrame):
 
         # Function to clear all the widgets' entries
         def clear(field):
+            """
+            Clear specific entry fields and update combo box states.
+
+            Args:
+                field (str): The field to be cleared. Options: 'all', 'res_all', 'res', 'vis', 'd_all'.
+
+            Returns:
+                None
+            """
             change_state("E_ALL")  # Reset all entry widgets to normal state
 
             if field in ("all", "res_all"):
@@ -243,18 +182,19 @@ class MainScreen(ctk.CTkFrame):
                 widget.delete(0, tkinter.END)
 
         # Labels for the Entry boxes
-        search_room_label = ctk.CTkLabel(self, text="Search by Room:", font=("Times", 15))  # Search by room label
+        # Labels for Entry Boxes
+        search_room_label = ctk.CTkLabel(self, text="Search by Room:",
+                                         font=("Times", 15))  # Label for searching by room
         res_label = ctk.CTkLabel(self, text="Visitor Information",
-                                 font=("Times", 20, "bold", "italic"), )  # Search by room label
-        res_fname_label = ctk.CTkLabel(self, text="First Name:", font=("Times", 14))  # Search by room label
-        res_lname_label = ctk.CTkLabel(self, text="Last Name:", font=("Times", 14))  # Search by room label
-        res_mail_label = ctk.CTkLabel(self, text="Email:", font=("Times", 14))  # Search by room label
-        vis_fname_label = ctk.CTkLabel(self, text="First Name:", font=("Times", 14))  # Search by room label
-        vis_lname_label = ctk.CTkLabel(self, text="Last Name:", font=("Times", 14))  # Search by room label
-        vis_cont_label = ctk.CTkLabel(self, text="Phone number:", font=("Times", 14))  # Search by room label
+                                 font=("Times", 20, "bold", "italic"))  # Label for visitor information
+        res_fname_label = ctk.CTkLabel(self, text="First Name:", font=("Times", 14))  # Label for resident first name
+        res_lname_label = ctk.CTkLabel(self, text="Last Name:", font=("Times", 14))  # Label for resident last name
+        res_mail_label = ctk.CTkLabel(self, text="Email:", font=("Times", 14))  # Label for resident email
+        vis_fname_label = ctk.CTkLabel(self, text="First Name:", font=("Times", 14))  # Label for visitor first name
+        vis_lname_label = ctk.CTkLabel(self, text="Last Name:", font=("Times", 14))  # Label for visitor last name
+        vis_cont_label = ctk.CTkLabel(self, text="Phone number:", font=("Times", 14))  # Label for visitor phone number
 
         # Placing Labels for Entry Boxes
-
         search_room_label.place(relx=0.03, rely=0.15)
         res_label.place(relx=0.55, rely=0.18)
         res_fname_label.place(relx=0.03, rely=0.3)
@@ -275,16 +215,21 @@ class MainScreen(ctk.CTkFrame):
 
         # Creating the customtkinter entry boxes
         # Resident
-        res_room_entry = ctk.CTkEntry(self, font=("Times", 14), width=90, textvariable=room_input)  # Resident Room
+        res_room_entry = ctk.CTkEntry(self, font=("Times", 14), width=90,
+                                      textvariable=room_input)  # Entry for resident room
         res_fname_entry = ctk.CTkEntry(self, font=("Times", 14), textvariable=fname_input,
-                                       width=200)  # Resident Firstname
+                                       width=200)  # Entry for resident first name
         res_lname_entry = ctk.CTkEntry(self, font=("Times", 14), width=200,
-                                       textvariable=lname_input)  # Resident Lastname
-        res_email_entry = ctk.CTkEntry(self, font=("Times", 14), width=200, textvariable=mail_input)  # Resident Email
+                                       textvariable=lname_input)  # Entry for resident last name
+        res_email_entry = ctk.CTkEntry(self, font=("Times", 14), width=200,
+                                       textvariable=mail_input)  # Entry for resident email
         # Visitors
-        vis_fname_entry = ctk.CTkEntry(self, font=("Times", 14), textvariable=vis_fname_input, width=200)
-        vis_lname_entry = ctk.CTkEntry(self, font=("Times", 14), textvariable=vis_lname_input, width=200)
-        vis_cont_entry = ctk.CTkEntry(self, validate="key", validatecommand=(validate_func, "%P"))
+        vis_fname_entry = ctk.CTkEntry(self, font=("Times", 14), textvariable=vis_fname_input,
+                                       width=200)  # Entry for visitor first name
+        vis_lname_entry = ctk.CTkEntry(self, font=("Times", 14), textvariable=vis_lname_input,
+                                       width=200)  # Entry for visitor last name
+        vis_cont_entry = ctk.CTkEntry(self, validate="key",
+                                      validatecommand=(validate_func, "%P"))  # Entry for visitor phone number
         now_day = ctk.StringVar()
         now_day.set(datetime.today().strftime("%m/%d/%y"))
         date_entry = ctk.CTkEntry(self, font=("Times", 14), width=67, textvariable=now_day)
@@ -318,7 +263,17 @@ class MainScreen(ctk.CTkFrame):
                                             state="disabled")
 
         def add_resident(res_fname, res_lname, res_email, res_room, filename=people_path):
-            res_room = str(re.findall("[A-Za-z]\\d{3}", res_room_entry.get())[0])
+            """
+            Add a resident to the system.
+
+            Args:
+                res_fname (str): The resident's first name.
+                res_lname (str): The resident's last name.
+                res_email (str): The resident's email.
+                res_room (str): The resident's room number.
+                filename (str, optional): The file to save the resident data. Defaults to people_path.
+            """
+            res_room = str(re.findall("[A-Za-z]\\d{3}", res_room)[0])
             full_name = res_fname.lower() + " " + res_lname.lower()
             resident_profile = {"full_name": full_name.strip(),
                                 "email": res_email.lower().strip(),
@@ -330,19 +285,28 @@ class MainScreen(ctk.CTkFrame):
                 # Checks if there is no resident, this creates a new one. If there is no resident with the given data,
                 # the new data create a resident
                 if not bool(file_data['residents']):
+                    # If there are no residents, create a new one.
                     file_data['residents'].append(resident_profile)
                     file.seek(0)
                     json.dump(file_data, file, indent=1)
-                # Else, if the resident is not empty, then check if the given data corresponds to any of the resident
-                # information in the system. If there is no match, use the new data to create a new resident
                 elif all(file_data.get('residents')) and not any(
                         resident.get('full_name', '').lower() == full_name.lower() for resident in
                         file_data.get('residents', [])):
+                    # If residents exist but no matching resident, create a new one.
                     file_data['residents'].append(resident_profile)
                     file.seek(0)
                     json.dump(file_data, file, indent=1)
 
         def fill_visitor_entries(choice):
+            """
+           Fill visitor entry fields with data based on the selected visitor choice.
+
+           Args:
+               choice (str): The selected visitor's name.
+
+           Returns:
+               str: The selected visitor's full name.
+           """
             time_now = datetime.now().strftime("%H:%M")
             today = datetime.today().strftime("%m/%d/%y")
             clear("vis")
@@ -362,6 +326,15 @@ class MainScreen(ctk.CTkFrame):
             return choice.split(" ")[0] + " " + choice.split(" ")[1]
 
         def fill_resident_entries(choice):
+            """
+            Fill resident entry fields with data based on the selected resident choice.
+
+            Args:
+                choice (str): The selected resident's name.
+
+            Returns:
+                str: The selected resident's full name.
+            """
             clear("res")
 
             res_fname_entry.insert(0, choice.split(" ")[0])
@@ -396,18 +369,28 @@ class MainScreen(ctk.CTkFrame):
             return choice.split(" ")[0] + " " + choice.split(" ")[1]
 
         def make_resident_list(event=None, filename=people_path):
+            """
+            Create a list of residents based on the specified room and update the res_combobox.
+
+            Args:
+                event (Event, optional): Event that triggered the update. Defaults to None.
+                filename (str, optional): The file containing resident data. Defaults to people_path.
+
+            Returns:
+                list: A list of residents and their emails.
+            """
             res_room = res_room_entry.get().strip()  # Ensure you have a valid res_room_entry
             with open(filename, 'r+') as file:
                 file_data = json.load(file)
 
-            # Create a list to store resident names
+            # Create a list to store resident names and emails
             list_of_residents = []
             list_of_resMails = []
 
             # Collect resident names
             for resident in file_data['residents']:
                 if resident['room'].lower() == res_room.lower():
-                    # Append resident's full name to the list
+                    # Append resident's full name to the list with their respective emails
                     list_of_residents.append(resident.get('full_name').title())
                     list_of_resMails.append(resident.get('full_name').title() + " " + resident.get('email').lower())
 
@@ -432,6 +415,16 @@ class MainScreen(ctk.CTkFrame):
             return [list_of_residents, list_of_resMails]
 
         def make_visitor_list(event=None, filename=people_path):
+            """
+           Create a list of visitors for the selected resident and update the vis_combobox.
+
+           Args:
+               event (Event, optional): Event that triggered the update. Defaults to None.
+               filename (str, optional): The file containing resident data. Defaults to people_path.
+
+           Returns:
+               list: A list of visitors and their contacts.
+           """
             res_fname = res_fname_entry.get()
             res_lname = res_lname_entry.get()
             full_name = f"{res_fname.lower()} {res_lname.lower()}"
@@ -473,6 +466,17 @@ class MainScreen(ctk.CTkFrame):
         clear_button.place(relx=0.03, rely=0.625)
 
         def add_visitor(vis_fname, vis_lname, vis_cont, res_room, res_name, filename=people_path):
+            """
+            Add a visitor to the selected resident's visitors list.
+
+            Args:
+                vis_fname (str): Visitor's first name.
+                vis_lname (str): Visitor's last name.
+                vis_cont (str): Visitor's contact information.
+                res_room (str): The resident's room number.
+                res_name (str): The full name of the resident.
+                filename (str, optional): The file containing resident data. Defaults to people_path.
+            """
             vis_full_name = f"{vis_fname.lower()} {vis_lname.lower()}"
             visitor_profile = {"vis_fullname": vis_full_name, "vis_cont": vis_cont}
 
@@ -496,8 +500,21 @@ class MainScreen(ctk.CTkFrame):
                             file.seek(0)
                             json.dump(file_data, file, indent=1)
 
-        # Function used to check in visitors
         def checkin_visitor(vis_fname, vis_lname, vis_cont, res_room, res_name, filename=visitation_path):
+            """
+           Check in a visitor and record their information.
+
+           Args:
+               vis_fname (str): Visitor's first name.
+               vis_lname (str): Visitor's last name.
+               vis_cont (str): Visitor's contact information.
+               res_room (str): The resident's room number.
+               res_name (str): The full name of the resident.
+               filename (str, optional): The file containing visitation data. Defaults to visitation_path.
+
+           Returns:
+               bool: True if the visitor is already checked in for the current date, False otherwise.
+           """
             time_now = datetime.now().strftime('%H:%M')
             checkin_date = datetime.today().strftime('%m/%d/%y')
             vis_full_name = f'{vis_fname.lower()} {vis_lname.lower()}'
@@ -524,7 +541,8 @@ class MainScreen(ctk.CTkFrame):
                                             option_1="OK")
                         return True
 
-            else:  # Add the new visitor to the list
+            else:
+                # Add the new visitor to the list
                 file_data['visitation'].append(visitor_profile)
 
                 # Save the updated visitation data
@@ -538,6 +556,13 @@ class MainScreen(ctk.CTkFrame):
                 return False
 
         def validate_entry(event=None):
+            """
+            Validate visitor and resident information and check in the visitor.
+
+            Args:
+                event (Event, optional): The event that triggered the validation. Defaults to None.
+            """
+
             resident_room = res_room_entry.get().lower().strip()
             resident_room_pattern = "^[A-Za-z]\d{3}"  # The desired pattern
             checkin_times = datetime.now().strftime("%H:%M")
@@ -569,14 +594,12 @@ class MainScreen(ctk.CTkFrame):
                                             checkin_visitor(vis_fname_entry.get().strip(), vis_lname_entry.get().strip()
                                                             , vis_cont_entry.get().strip(), resident_room.strip(),
                                                             resident_full_name.strip())
-                                            # clear("all")
 
                                         # Update the vis_combobox with no visitors found
                                         except json.JSONDecodeError:
                                             msg = CTkMessagebox(title="Error", message="Error: Submission unsuccessful."
                                                                 , icon="cancel",
                                                                 option_1="OK")
-                                        # clear("all")
                                         break
 
                         if found_resident and not found_visitor:
@@ -634,12 +657,22 @@ class MainScreen(ctk.CTkFrame):
 
         # Function to change the state of the Visitor to check out entry fields
         def change_cout_state():
+            """
+            Change the state of the checkout visitor entry fields to 'readonly'.
+            """
             vis_cout_fname.configure(state="readonly")
             vis_cout_lname.configure(state="readonly")
 
         def checkout_visitor_entries(choice):
-            # time_now = datetime.now().strftime("%H:%M")
-            # today = datetime.today().strftime("%m/%d/%y")
+            """
+            Fill the checkout visitor entry fields with the selected visitor's information.
+
+            Args:
+                choice (str): The selected visitor's name.
+
+            Returns:
+                str: The full name of the selected visitor.
+            """
             vis_cout_fname.configure(state="normal")
             vis_cout_lname.configure(state="normal")
 
@@ -656,6 +689,15 @@ class MainScreen(ctk.CTkFrame):
             return vis_fname + " " + vis_lname
 
         def checkout_visitors_list(event=None):
+            """
+            Generate a list of visitors to check out and update the vis_cout_combobox.
+
+            Args:
+                event (Event, optional): The event that triggered the update. Defaults to None.
+
+            Returns:
+                list: A list of visitors to check out and their check-in times.
+            """
             today = datetime.today().strftime("%m/%d/%y")
             visitors_list_today = []
             checkin_visit_time = []
@@ -669,39 +711,19 @@ class MainScreen(ctk.CTkFrame):
                 vis_cout_combobox.set("No Visitor")
                 vis_cout_combobox.configure(state="disabled")
             if len(visitors_list_today) > 0:
-                vis_cout_combobox.configure(state="readonly", values=visitors_list_today, command=checkout_visitor_entries)
+                vis_cout_combobox.configure(state="readonly", values=visitors_list_today,
+                                            command=checkout_visitor_entries)
                 vis_cout_combobox.set(visitors_list_today[0])
 
             return [visitors_list_today, checkin_visit_time]
 
-        def send_checkout_msg(phone_number):
-            with open(visitation_path, 'r+') as file:
-                file_data = json.load(file)
-                today = datetime.today().strftime("%m/%d/%y")
-                for visit in file_data['visitation']:
-                    if visit["vis_fullname"].lower() != "" and visit["checkin_time"] != "" and visit["checkout_time"] != "" and \
-                            visit["checkin_date"] == today:
-                        checkin_date = visit["checkin_date"]
-                        checkin_date = datetime.strptime(checkin_date, "%m/%d/%y")
-                        checkin_date = checkin_date.strftime("%b %d, %Y")
-                        checkin_time = visit["checkin_time"]
-                        checkout_time = visit['checkout_time']
-                        resident = str(visit["res_fullname"]).title()
-                        visitor = str(visit["vis_fullname"]).split()[0].title()
-                        room = str(visit["res_room"]).title()
-                        vis_cont_num = visit["vis_cont"]
-
-                        checkout_msg = f"Hello {visitor},\n\nWe hope you enjoyed visiting {resident} ({room}) on {checkin_date}, from {checkin_time} to {checkout_time}.\n\nSincerely,\nHeadington Hall Front Desk "
-                        try:
-                            client = Client(secrets.account_sid, secrets.auth_token)
-                            message = client.messages.create(
-                                body=checkout_msg,
-                                from_=secrets.twilio_number,
-                                to=phone_number)
-                        except Exception as e:
-                            print(e)
-
         def checkout_visitor(event=None):
+            """
+            Check out a visitor and record their checkout time and send a checkout message to the visitor's contact number.
+
+            Args:
+                event (Event, optional): The event that triggered the checkout. Defaults to None.
+            """
             today = datetime.today().strftime("%m/%d/%y")
             current_time = datetime.now().strftime("%H:%M")
             visitor_to_checkout = vis_cout_fname.get() + " " + vis_cout_lname.get()
@@ -712,9 +734,25 @@ class MainScreen(ctk.CTkFrame):
                     if visit["checkin_date"] == today:
                         if visit["vis_fullname"].lower() == visitor_to_checkout.lower() and visit["checkout_time"] == "":
                             visit['checkout_time'] = current_time
-                            msg = CTkMessagebox(title="Success", message="Visitor successfully checked-out", icon="check",
+                            checkin_date = visit["checkin_date"]
+                            checkin_date = datetime.strptime(checkin_date, "%m/%d/%y")
+                            checkin_date = checkin_date.strftime("%b %d, %Y")
+                            checkins_time = visit["checkin_time"]
+                            checkout_time = visit['checkout_time']
+                            resident = str(visit["res_fullname"]).title()
+                            visitor = str(visit["vis_fullname"]).split()[0].title()
+                            room = str(visit["res_room"]).title()
+                            phone_number = visit["vis_cont"]
+
+                            msg = CTkMessagebox(title="Success", message="Visitor successfully checked-out",
+                                                icon="check",
                                                 option_1="OK")
-                            send_checkout_msg(visit["vis_cont"])  # Send the message after updating checkout time
+                            checkout_msg = f"Hello {visitor},\n\nWe hope you enjoyed visiting {resident} ({room}) on {checkin_date}, from {checkins_time} to {checkout_time}.\n\nSincerely,\nHeadington Hall Front Desk "
+                            client = Client(secrets.account_sid, secrets.auth_token)
+                            message = client.messages.create(
+                                body=checkout_msg,
+                                from_=secrets.twilio_number,
+                                to=phone_number)
                             break
 
             with open(visitation_path, 'w') as file:
@@ -728,6 +766,12 @@ class MainScreen(ctk.CTkFrame):
             checkout_visitors_list()
 
         def cancel(event):
+            """
+            Cancel the checkout process and reset the checkout visitor entry fields.
+
+            Args:
+                event (Event): The event that triggered the cancellation.
+            """
             vis_cout_fname.configure(state='normal')
             vis_cout_lname.configure(state='normal')
             vis_cout_fname.delete(0, tkinter.END)
@@ -740,7 +784,10 @@ class MainScreen(ctk.CTkFrame):
         cancel_button.place(relx=0.03, rely=0.94)
         cancel_button.bind("<Button-1>", cancel)
 
-
+        # Activate the WeatherAPI to make this work
+        # # Can readjust the location
+        # weather_frame = WeatherDisplayFrame(self, height=180, width=180, corner_radius=150, border_width=8, border_color='#03396c')
+        # weather_frame.place(relx=0.5, rely=0.1, anchor="n")
 
 
 if __name__ == '__main__':
