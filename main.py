@@ -6,7 +6,7 @@ import re
 import tkinter
 import json
 from datetime import datetime
-import secrets
+import secrets # File containing all Twilio and API information - this allows to send messages to checked-out visitors
 
 
 class App(ctk.CTk):
