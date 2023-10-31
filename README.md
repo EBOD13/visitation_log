@@ -2,23 +2,20 @@
 
 ## Overview
 
-The Headington Hall Visitation Logging System is a comprehensive digital solution designed to streamline visitor management at Headington Hall, a prestigious residential facility. This system offers an array of features for efficient visitor check-in, automated notifications, and reporting.
+The Headington Hall Visitation Logging System is a project I initiated in early September with the aim of enhancing visitor management at Headington Hall, a prestigious residential facility at the University of Oklahoma. This system incorporates a wide range of features designed to facilitate visitor check-in, automate notifications, and minimize complications associated with the visitation log.
+
+## Goal
+The objective of this project was to streamline the tasks of a front desk clerk. Previously, manually inputting visitor information, such as first name, last name, check-in and check-out times, and the resident they were visiting, into a disorganized Excel sheet proved to be a cumbersome and time-consuming process. Recognizing the need for a more efficient system, I aimed to simplify the visitor check-in process by creating a link between visitor data and the corresponding resident, primarily through the resident's room number, a crucial piece of information.
+
+My solution involved implementing a database to store visitor information and enable easy check-in and check-out procedures. This approach significantly reduced the time required for each visit's check-in and check-out process, making it more efficient.
 
 ## Key Features
 
-- **User-Friendly Interface:** The system provides an intuitive interface for residents and front desk staff to manage visitor data efficiently.
+- **User-Friendly Interface:** The system was developed using customtkinter, a framework that leverages the tkinter library module to create an aesthetically pleasing graphical user interface (GUI).
 
 - **Real-Time Data Validation:** Data entered into the system is validated in real-time, reducing errors and ensuring accurate records.
 
-- **Automated Notifications:** The system sends automated notifications to residents when their visitors arrive and to visitors upon checkout.
-
-- **Reporting:** It generates visitation reports for valuable insights into visitor traffic and patterns.
-
-- **Twilio Integration:** Seamlessly integrates with Twilio for SMS notifications to enhance communication with visitors.
-
-## Access Control
-
-This system is designed to be used primarily by the front desk staff. They have the permissions required to check in visitors and initiate the checkout process. Residents can interact with the system to communicate with their visitors and receive notifications, but the check-in and check-out processes are managed by the front desk staff.
+- **Automated Notifications:** With the help of Twilio, the system automatically sends notifications containing the visitor's visit details upon their checkout.
 
 ## Installation
 
