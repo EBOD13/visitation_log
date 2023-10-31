@@ -1,0 +1,26 @@
+{
+ "residents": [
+  {
+   "full_name": "marie curie",
+   "email": "marie.curie@gmail.com",
+   "room": "n222",
+   "visitors": [
+    {
+     "vis_fullname": "albert einstein",
+     "vis_cont": "1234506789"
+    }
+   ]
+  },
+  {
+    "full_name": "john doe",
+    "email": "john.doe@gmail.com",
+    "room": "n223",
+    "visitors": [
+     {
+      "vis_fullname": "red book",
+      "vis_cont": "5555555555"
+     }
+    ]
+   }
+ ]
+}

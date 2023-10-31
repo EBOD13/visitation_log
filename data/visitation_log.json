@@ -1,0 +1,22 @@
+{
+ "visitation": [
+  {
+   "checkin_date": "10/31/23",
+   "res_fullname": "marie curie",
+   "vis_fullname": "albert einstein",
+   "res_room": "n222",
+   "vis_cont": "",
+   "checkin_time": "19:05",
+   "checkout_time": "20:32"
+  },
+  {
+    "checkin_date": "10/31/23",
+    "res_fullname": "john doe",
+    "vis_fullname": "red book",
+    "res_room": "n223",
+    "vis_cont": "",
+    "checkin_time": "12:09",
+    "checkout_time": ""
+   }
+ ]
+}
