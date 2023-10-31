@@ -24,9 +24,9 @@ The project utilized JSON files for data storage, offering a reliable NoSQL stru
 Another limitation arises from the project's Python and customtkinter-based design, making it exclusive to Windows devices. To overcome this, I plan to transform the application into a web-based platform with enhanced access control for improved security. This transformation may present challenges, as it requires the utilization of new programming tools I haven't worked with before, such as Pyscript, ReactJS, Flask, and/or Firebase.
 
 ## App Layout
-Images of the app layout can be found on the GUI folder. But I am outting some here.
+Images of the app layout can be located in the "GUI" folder, and a few examples are provided below.
 
-![main_app](https://github.com/EBOD13/visitation_log/blob/main/GUI/Screenshot%20(28).png)
+<img src="https://github.com/EBOD13/visitation_log/blob/main/GUI/Screenshot%20(28).png" width="200" height="200" />
 
 
 ## Installation
