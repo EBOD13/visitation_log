@@ -26,7 +26,7 @@ Another limitation arises from the project's Python and customtkinter-based desi
 ## App Layout
 Images of the app layout can be found on the GUI folder. But I am outting some here.
 
-![main_app](Screenshot_(28).png)
+![main_app](https://github.com/EBOD13/visitation_log/blob/main/GUI/Screenshot%20(28).png)
 
 
 ## Installation
