@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from customtkinter import CTkToplevel
 from twilio.rest import Client
 from CTkMessagebox import CTkMessagebox
 import re
@@ -6,6 +7,8 @@ import tkinter
 import json
 from datetime import datetime
 import secrets # File contains all API keys and auth from Twilio and the WeatherAPI
+import sys
+import os
 from weather import WeatherDisplayFrame
 
 
@@ -21,8 +24,15 @@ class App(ctk.CTk):
        """
         super().__init__(**kwargs)
 
+        def icon_path(relative_path):
+            """ Get absolute path to resource, works for dev and for PyInstaller """
+            base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+            return os.path.join(base_path, relative_path)
+
+        icon_path = icon_path(r"data\Headington Logo.ico")
+
         self.geometry("500x700")  # Set the initial window size
-        self.iconbitmap(r"venv/data/images/Headington Logo.ico")  # Set the window icon
+        self.iconbitmap(icon_path)  # Set the window icon
         self.title("Headington Portal")  # Set the window title
         self.resizable(False, False)  # Disable window resizing
         self.main_screen = MainScreen(self, self.winfo_screenheight(),
@@ -68,8 +78,15 @@ class MainScreen(ctk.CTkFrame):
         checkout_button = ctk.CTkButton(self, text="Check Out", width=95, fg_color="#841617",
                                         hover_color='#991112')
         checkout_button.place(relx=0.24, rely=0.94)
-        visitation_path = r"venv/data/json_files/visitation_log.json"
-        people_path = r"venv/data/json_files/people_profile.json"
+
+        def resource_path(relative_path):
+            """ Get absolute path to resource, works for dev and for PyInstaller """
+
+            base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+            return os.path.join(base_path, relative_path)
+
+        visitation_path = resource_path(r"data\visitation_log.json")
+        people_path = resource_path(r"data\people_profile.json")
 
         # Several functions for widget behavior and states
         # Function to capitalize entries and make change email to lowercase
@@ -732,7 +749,8 @@ class MainScreen(ctk.CTkFrame):
                 file_data = json.load(file)
                 for visit in file_data['visitation']:
                     if visit["checkin_date"] == today:
-                        if visit["vis_fullname"].lower() == visitor_to_checkout.lower() and visit["checkout_time"] == "":
+                        if visit["vis_fullname"].lower() == visitor_to_checkout.lower() and visit[
+                            "checkout_time"] == "":
                             visit['checkout_time'] = current_time
                             checkin_date = visit["checkin_date"]
                             checkin_date = datetime.strptime(checkin_date, "%m/%d/%y")
