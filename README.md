@@ -17,6 +17,12 @@ My solution involved implementing a database to store visitor information and en
 
 - **Automated Notifications:** With the help of Twilio, the system automatically sends notifications containing the visitor's visit details upon their checkout.
 
+## Limitation & Future Improvement 
+
+The project utilized JSON files for data storage, offering a reliable NoSQL structure. However, this restricts its use to my personal access. To address this, my future goal is to transition to a NoSQL cloud database like MongoDB, enabling data storage and retrieval over the web.
+
+Another limitation arises from the project's Python and customtkinter-based design, making it exclusive to Windows devices. To overcome this, I plan to transform the application into a web-based platform with enhanced access control for improved security. This transformation may present challenges, as it requires the utilization of new programming tools I haven't worked with before, such as Pyscript, ReactJS, Flask, and/or Firebase.
+
 ## Installation
 
 To install and set up the Headington Hall Visitation Logging System, follow these steps:
