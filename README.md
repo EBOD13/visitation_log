@@ -27,4 +27,4 @@ To install and set up the Headington Hall Visitation Logging System, follow thes
 1. Clone this repository to your local machine:
 
    ```shell
-   git clone https://github.com/yourusername/your-repo.git
+   git clone https://github.com/EBOD13/your-repo.git
